@@ -92,3 +92,5 @@ This launches a reconstructed version of the training recipe reported in the pap
 ## Citation context
 
 If you use this repository academically, please cite the original paper and clearly note that this codebase is a reconstruction based on the PDF description rather than an official upstream implementation.
+
+**AI Assistance Disclaimer**: This codebase was developed with the assistance of Claude Code. While the AI provided code generation, debugging, and structural support, the human developer maintains full responsibility for reviewing, testing, and maintaining all content and functionality.
