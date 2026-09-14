@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -22,11 +23,16 @@ CRISIS_TERMS = {
     "end my life",
 }
 
+# Word-boundary match: plain substring search false-triggers on e.g. "myself
+# harmless" (contains "self harm") and misses nothing a substring check would
+# have caught, since every term already reads as whole words.
+_CRISIS_PATTERNS = [re.compile(r"\b" + re.escape(term) + r"\b") for term in CRISIS_TERMS]
+
 
 def screen_message(message: str) -> SafetyResult:
     lowered = message.lower()
-    for term in CRISIS_TERMS:
-        if term in lowered:
+    for pattern in _CRISIS_PATTERNS:
+        if pattern.search(lowered):
             return SafetyResult(
                 allowed=False,
                 reason="crisis",

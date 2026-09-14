@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+import importlib.util
+
 import streamlit as st
 
 from apabot import APABotEngine
-from apabot.config import PAPER_CONFIG
+from apabot.config import DEFAULT_MODEL_FILE, PAPER_CONFIG
 
 
 st.set_page_config(page_title="APABOT", page_icon="💬", layout="wide")
+
+
+def check_dependencies() -> dict[str, bool]:
+    """Cheap presence check (no import) for the two mandatory ML dependencies."""
+    return {
+        "torch": importlib.util.find_spec("torch") is not None,
+        "parlai": importlib.util.find_spec("parlai") is not None,
+    }
 
 
 @st.cache_resource
@@ -16,7 +26,30 @@ def load_engine() -> APABotEngine:
     return APABotEngine()
 
 
+# Dependency/model-status banner — rendered first so it is the first thing a
+# visitor sees, above the title. PyTorch and ParlAI are mandatory for the
+# trained APABOT model; without them the app only runs the keyword-based
+# fallback responder in apabot/engine.py, not the paper's chatbot.
+deps = check_dependencies()
+missing = [name for name, installed in deps.items() if not installed]
 engine = load_engine()
+
+if missing:
+    st.error(
+        "🚫 Missing mandatory dependency: **"
+        + ", ".join(missing)
+        + "**. PyTorch and ParlAI are both required to run the trained APABOT model. "
+        "Install with `pip install -r requirements.txt`. Until then, every reply below "
+        "comes from the limited fallback responder, not the trained model."
+    )
+elif not engine.is_using_parlai:
+    st.warning(
+        "⚠️ PyTorch and ParlAI are installed, but no trained model was found at "
+        f"`{DEFAULT_MODEL_FILE}`. Replies below use the fallback responder. "
+        "Run `python3 scripts/train_parlai.py` to train one."
+    )
+else:
+    st.success("✅ PyTorch and ParlAI are installed and the trained model is active.")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -52,11 +85,12 @@ for message in st.session_state.messages:
 
 prompt = st.chat_input("Type your message")
 if prompt:
+    history = list(st.session_state.messages)  # turns before this one, matching chat_cli.py's contract
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    result = engine.chat(prompt, st.session_state.messages)
+    result = engine.chat(prompt, history)
     assistant_message = f"{result.response}\n\n`Backend: {result.backend}`"
     st.session_state.messages.append({"role": "assistant", "content": assistant_message})
 

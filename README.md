@@ -2,7 +2,7 @@
 
 APABOT is a Python and Streamlit reconstruction of the paper **"APABOT: A Chatbot for ASD Treatment Implemented by ParlAI"** from the PDF included in this repository:
 
-- [Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf](/Users/arli/Documents/arliadityaparikesit-data-macbookpro-intel/Documents/RESEARCH%20DATA%20AND%20TALKS/CLAUDE-COWORK-PROJECT/ASD-chatbot/Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf)
+- [Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf](./Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf)
 
 ## What this repository contains
 
@@ -26,7 +26,7 @@ The manuscript reports the following design:
 - Maximum training time: `20` minutes
 - Reported hardware: single Tesla T4 GPU
 
-These parameters are captured in [`apabot/config.py`](/Users/arli/Documents/arliadityaparikesit-data-macbookpro-intel/Documents/RESEARCH%20DATA%20AND%20TALKS/CLAUDE-COWORK-PROJECT/ASD-chatbot/apabot/config.py).
+These parameters are captured in [`apabot/config.py`](apabot/config.py).
 
 ## Important limitations
 
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ## Dependencies
 
-The included [`requirements.txt`](/Users/arli/Documents/arliadityaparikesit-data-macbookpro-intel/Documents/RESEARCH%20DATA%20AND%20TALKS/CLAUDE-COWORK-PROJECT/ASD-chatbot/requirements.txt) contains:
+The included [`requirements.txt`](requirements.txt) contains:
 
 ```txt
 streamlit>=1.45.0
@@ -53,7 +53,12 @@ parlai>=1.7.2
 torch>=2.2.0
 ```
 
-If you want a lighter local demo without ParlAI model training, `streamlit` alone is enough for the fallback mode.
+**PyTorch and ParlAI are mandatory to run the trained APABOT model — this is not optional.** With
+only `streamlit` installed, the app still starts, but every reply comes from a hardcoded
+keyword-matching fallback in `apabot/engine.py`, not the paper's model. The Streamlit app checks
+both dependencies on load and shows a banner at the top of the page: red if either is missing,
+yellow if both are installed but no trained model file exists yet, green once the trained model is
+active.
 
 ## Run the Streamlit app
 
@@ -92,5 +97,3 @@ This launches a reconstructed version of the training recipe reported in the pap
 ## Citation context
 
 If you use this repository academically, please cite the original paper and clearly note that this codebase is a reconstruction based on the PDF description rather than an official upstream implementation.
-
-**AI Assistance Disclaimer**: This codebase was developed with the assistance of Claude Code. While the AI provided code generation, debugging, and structural support, the human developer maintains full responsibility for reviewing, testing, and maintaining all content and functionality.

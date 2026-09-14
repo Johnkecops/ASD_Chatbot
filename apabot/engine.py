@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,11 @@ class APABotEngine:
         self._parlai_agent = None
         self._parlai_error = None
         self._try_load_parlai()
+
+    @property
+    def is_using_parlai(self) -> bool:
+        """True once a trained ParlAI model is loaded and answering chat()."""
+        return self._parlai_agent is not None
 
     def _try_load_parlai(self) -> None:
         try:
@@ -57,6 +63,7 @@ class APABotEngine:
                 return self._chat_with_parlai(message)
             except Exception as exc:  # pragma: no cover
                 self._parlai_error = f"Runtime error while generating from ParlAI: {exc}"
+                self._parlai_agent = None
 
         fallback_response = self._chat_with_fallback(message, history or [])
         return ChatResult(
@@ -66,7 +73,8 @@ class APABotEngine:
         )
 
     def _chat_with_parlai(self, message: str) -> ChatResult:
-        assert self._parlai_agent is not None
+        if self._parlai_agent is None:
+            raise RuntimeError("_chat_with_parlai called with no loaded ParlAI agent")
         self._parlai_agent.observe({"text": message, "episode_done": True})
         reply: dict[str, Any] = self._parlai_agent.act()
         text = str(reply.get("text", "")).strip() or "I’m here with you. Could you tell me a bit more?"
@@ -95,7 +103,7 @@ class APABotEngine:
                 "You can ask about ASD, sensory sensitivity, or talk through how you are feeling."
             )
 
-        if "i have asd" in lowered or "i am autistic" in lowered:
+        if re.search(r"\bi have asd\b", lowered) or re.search(r"\bi am autistic\b", lowered):
             return (
                 "Thank you for telling me that. I’ll try to keep my responses clear and calm. "
                 "If you want, we can focus on sensory concerns, communication practice, or a specific situation."

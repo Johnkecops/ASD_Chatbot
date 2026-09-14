@@ -70,10 +70,20 @@ def main() -> int:
         return 0
 
     try:
-        return subprocess.call(command, cwd=ROOT)
+        return_code = subprocess.call(command, cwd=ROOT)
     except FileNotFoundError:
-        print("ParlAI is not installed in this environment. Install requirements first.", file=sys.stderr)
+        print("python3 was not found on PATH.", file=sys.stderr)
         return 1
+
+    # subprocess.call returns the exit code rather than raising on failure, so a
+    # missing ParlAI install surfaces here as a non-zero code, not an exception.
+    if return_code != 0:
+        print(
+            "Training command exited with a non-zero status. If ParlAI is not "
+            "installed, run `pip install -r requirements.txt` first.",
+            file=sys.stderr,
+        )
+    return return_code
 
 
 if __name__ == "__main__":
