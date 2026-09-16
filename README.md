@@ -2,7 +2,7 @@
 
 APABOT is a Python and Streamlit reconstruction of the paper **"APABOT: A Chatbot for ASD Treatment Implemented by ParlAI"** from the PDF included in this repository:
 
-- [Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf](./Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI_RINarxiv.pdf)
+- [Shiloputra_et_al___2023___APABOT_A_Chatbot_for_ASD_Treatment_Implemented_by_ParlAI. Zenodo Preprint](https://zenodo.org/records/22789167) 
 
 ## What this repository contains
 
